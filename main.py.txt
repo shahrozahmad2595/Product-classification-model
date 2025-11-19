@@ -1,0 +1,175 @@
+"""
+Product Classification Model - Production Ready Script
+Author: Mahek
+Description:
+    This script loads a dataset, preprocesses it, trains multiple classification 
+    models, compares performance, selects the best model, saves it, and provides 
+    prediction functions for real-world deployment.
+"""
+
+import pandas as pd
+import numpy as np
+import os
+import logging
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+import pickle
+import warnings
+warnings.filterwarnings("ignore")
+
+# -----------------------------------------------------------
+# LOGGING SETUP
+# -----------------------------------------------------------
+logging.basicConfig(
+    filename="model.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+logging.info("Program Started")
+
+
+# -----------------------------------------------------------
+# LOAD DATASET
+# -----------------------------------------------------------
+def load_data(path):
+    if not os.path.exists(path):
+        logging.error(f"Dataset not found at: {path}")
+        raise FileNotFoundError("Dataset file missing")
+
+    logging.info("Dataset loaded successfully")
+    return pd.read_csv(path)
+
+
+# -----------------------------------------------------------
+# CLEANING + PREPROCESSING
+# -----------------------------------------------------------
+def preprocess_data(df, target_column):
+
+    logging.info("Starting preprocessing...")
+
+    # Fill missing numeric values
+    numeric_cols = df.select_dtypes(include=["int64", "float64"]).columns
+    for col in numeric_cols:
+        df[col] = df[col].fillna(df[col].median())
+
+    # Fill missing categorical values
+    cat_cols = df.select_dtypes(include=["object"]).columns
+    for col in cat_cols:
+        df[col] = df[col].fillna(df[col].mode()[0])
+
+    # Encoding categorical features
+    encoder = LabelEncoder()
+    for col in cat_cols:
+        df[col] = encoder.fit_transform(df[col])
+
+    X = df.drop(target_column, axis=1)
+    y = df[target_column]
+
+    # Scale numerical features
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+
+    logging.info("Preprocessing completed")
+    return X_scaled, y, scaler, encoder
+
+
+# -----------------------------------------------------------
+# MODEL TRAINING
+# -----------------------------------------------------------
+def train_models(X_train, y_train):
+    logging.info("Training started...")
+
+    models = {
+        "Logistic Regression": LogisticRegression(max_iter=500),
+        "SVM": SVC(probability=True),
+        "Random Forest": RandomForestClassifier(),
+        "Gradient Boosting": GradientBoostingClassifier()
+    }
+
+    trained_models = {}
+
+    for name, model in models.items():
+        model.fit(X_train, y_train)
+        trained_models[name] = model
+        logging.info(f"{name} trained successfully")
+
+    return trained_models
+
+
+# -----------------------------------------------------------
+# MODEL EVALUATION
+# -----------------------------------------------------------
+def evaluate_models(models, X_test, y_test):
+    logging.info("Evaluating models...")
+
+    scores = {}
+
+    for name, model in models.items():
+        pred = model.predict(X_test)
+        acc = accuracy_score(y_test, pred)
+        scores[name] = acc
+        logging.info(f"{name} Accuracy: {acc}")
+
+    return scores
+
+
+# -----------------------------------------------------------
+# SAVE MODEL
+# -----------------------------------------------------------
+def save_model(model, scaler, encoder):
+    with open("best_model.pkl", "wb") as f:
+        pickle.dump({
+            "model": model,
+            "scaler": scaler,
+            "encoder": encoder
+        }, f)
+    logging.info("Best model saved successfully")
+
+
+# -----------------------------------------------------------
+# REAL WORLD PREDICTION FUNCTION
+# -----------------------------------------------------------
+def predict_new(data):
+    with open("best_model.pkl", "rb") as f:
+        saved = pickle.load(f)
+
+    model = saved["model"]
+    scaler = saved["scaler"]
+
+    data_scaled = scaler.transform([data])
+    pred = model.predict(data_scaled)
+
+    return pred[0]
+
+
+# -----------------------------------------------------------
+# MAIN PROGRAM
+# -----------------------------------------------------------
+if __name__ == "__main__":
+    df = load_data("product_data.csv")
+
+    X, y, scaler, encoder = preprocess_data(df, "category")
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
+
+    models = train_models(X_train, y_train)
+    scores = evaluate_models(models, X_test, y_test)
+
+    best_model_name = max(scores, key=scores.get)
+    best_model = models[best_model_name]
+
+    print("Model Performance:")
+    print(scores)
+    print(f"\nBest Model: {best_model_name}")
+
+    save_model(best_model, scaler, encoder)
+
+    # Example prediction usage
+    # print(predict_new([12.5, 8.5, 3.2, 20.2]))
