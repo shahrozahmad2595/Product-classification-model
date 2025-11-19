@@ -1,7 +1,3 @@
-
----
-
-# ⚙ Installation
-
-```bash
-pip install -r requirements.txt
+pandas
+numpy
+scikit-learn
