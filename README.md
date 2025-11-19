@@ -1,34 +1,37 @@
-# 🏆 Product Classification ML Pipeline  
-### End-to-End, Production-Ready Machine Learning Project  
-Built for real-world deployment and GitHub excellence.
+# 🏆 Smart Product Classifier  
+### A Complete End-to-End Production-Ready ML Pipeline  
+Created for real-world product category prediction and GitHub deployment.
 
-## 📌 Project Overview
+---
 
-This repository delivers a **complete, production-grade machine learning pipeline** for **product category classification**.  
-Designed with modularity, scalability, and clarity in mind, it includes robust logging, error handling, model comparison, and deployment-ready outputs.
+## 📌 Overview
 
-Perfect for:
-- 🧑‍🎓 ML learners and students  
+This repository contains a **production-grade machine learning pipeline** for **product classification**.  
+It features clean code, modular design, logging, error handling, model comparison, and deployment-ready output.
+
+Ideal for:
+- 🧑‍🎓 ML students  
 - 📁 Data science portfolios  
 - 🚀 Startup prototypes  
-- 🛍 Real-world product classification systems  
 - 🌐 GitHub showcases  
+- 🛍 Real-world product classification systems  
 
-## 📊 Key Features
+---
 
-This pipeline is fully automated and customizable:
+## 📊 Features
 
-- ✅ Data preprocessing (cleaning, encoding, scaling)  
+- ✅ Automatic data preprocessing  
 - ✅ Missing value handling  
-- ✅ Categorical feature encoding  
+- ✅ Categorical encoding  
 - ✅ Feature scaling  
 - ✅ Training of 4 ML models  
 - ✅ Automatic best-model selection  
-- ✅ Model saving as `.pkl`  
+- ✅ Save best model as `.pkl`  
 - ✅ Real-time prediction function  
-- ✅ Step-by-step logging for transparency  
-- ✅ Modular and extensible codebase  
+- ✅ Logging for every step  
+- ✅ Fully customizable pipeline  
 
+---
 
 ## 🧠 Models Trained & Compared
 
@@ -41,4 +44,6 @@ This pipeline is fully automated and customizable:
 
 🔍 The pipeline **automatically selects and saves** the best-performing model.
 
-## 🏗 Architecture Overview
+---
+
+## 🏗 Project Architecture
